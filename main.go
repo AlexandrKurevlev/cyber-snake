@@ -51,34 +51,34 @@ func NewGame(width, height int) *Game {
 func (g *Game) draw() {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
-	//score and level
-	for i, ch := range fmt.Sprintf("Score: %d Level: %d", g.score, g.level) {
-		termbox.SetCell(i+5, 0, ch, termbox.ColorWhite, termbox.ColorDefault)
-	}
-
 	//border
-	termbox.SetCell(0, 1, '┌', termbox.ColorWhite, termbox.ColorDefault)
+	termbox.SetCell(0, 0, '┌', termbox.ColorWhite, termbox.ColorDefault)
 	for col := 1; col < g.width-1; col++ {
-		termbox.SetCell(col, 1, '─', termbox.ColorWhite, termbox.ColorDefault)
+		termbox.SetCell(col, 0, '─', termbox.ColorWhite, termbox.ColorDefault)
 	}
 
-	termbox.SetCell(g.width-1, 1, '┐', termbox.ColorWhite, termbox.ColorDefault)
+	termbox.SetCell(g.width-1, 0, '┐', termbox.ColorWhite, termbox.ColorDefault)
 	for row := 1; row < g.height-1; row++ {
-		termbox.SetCell(g.width-1, row+1, '│', termbox.ColorWhite, termbox.ColorDefault)
+		termbox.SetCell(g.width-1, row, '│', termbox.ColorWhite, termbox.ColorDefault)
 	}
 
-	termbox.SetCell(g.width-1, g.height, '┘', termbox.ColorWhite, termbox.ColorDefault)
+	termbox.SetCell(g.width-1, g.height-1, '┘', termbox.ColorWhite, termbox.ColorDefault)
 	for col := 1; col < g.width-1; col++ {
-		termbox.SetCell(col, g.height, '─', termbox.ColorWhite, termbox.ColorDefault)
+		termbox.SetCell(col, g.height-1, '─', termbox.ColorWhite, termbox.ColorDefault)
 	}
 
-	termbox.SetCell(0, g.height, '└', termbox.ColorWhite, termbox.ColorDefault)
+	termbox.SetCell(0, g.height-1, '└', termbox.ColorWhite, termbox.ColorDefault)
 	for row := 1; row < g.height-1; row++ {
-		termbox.SetCell(0, row+1, '│', termbox.ColorWhite, termbox.ColorDefault)
+		termbox.SetCell(0, row, '│', termbox.ColorWhite, termbox.ColorDefault)
 	}
 
 	//snake
 	termbox.SetCell(g.snake[0].x, g.snake[0].y, g.dir.ToRune(), termbox.ColorWhite, termbox.ColorDefault)
+
+	//score and level
+	for i, ch := range fmt.Sprintf("Score: %d Level: %d", g.score, g.level) {
+		termbox.SetCell(i+5, g.height, ch, termbox.ColorWhite, termbox.ColorDefault)
+	}
 
 	termbox.Flush()
 }
