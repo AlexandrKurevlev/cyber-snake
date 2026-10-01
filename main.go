@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type Point struct {
 	x, y int
 }
@@ -16,12 +18,19 @@ type Game struct {
 	quit          chan struct{}
 }
 
-func NewGame() *Game {
+func NewGame(width, height int) *Game {
 	return &Game{
-		snake:   make([]Point, 0),
+		snake:   []Point{{x: width / 2, y: height / 2}},
 		malware: make([]Point, 0),
+		dir:     Point{x: width/2 + 1, y: height / 2},
+		level:   1,
+		width:   width,
+		height:  height,
 		quit:    make(chan struct{}),
 	}
 }
 
-func main() {}
+func main() {
+	ng := NewGame(40, 20)
+	fmt.Printf("Игра создана: поле %dx%d, змейка в (%d, %d), направление вправо, уровень %d", ng.width, ng.height, ng.snake[0].x, ng.snake[0].y, ng.level)
+}
