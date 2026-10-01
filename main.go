@@ -262,8 +262,8 @@ func main() {
 		case ev := <-eventCh:
 			ng.handleInput(ev)
 		case <-ticker.C:
-			ng.move()
 			if !ng.gameOver {
+				ng.move()
 				ng.draw()
 			}
 		case <-ng.quit:
