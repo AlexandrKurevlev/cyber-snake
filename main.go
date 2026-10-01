@@ -12,13 +12,15 @@ type Point struct {
 
 func (p Point) ToRune() rune {
 	if p.x == 1 && p.y == 0 {
-		return rune('▶')
+		return '▶'
 	} else if p.x == 0 && p.y == 1 {
-		return rune('▼')
+		return '▼'
 	} else if p.x == -1 && p.y == 0 {
-		return rune('◀')
+		return '◀'
+	} else if p.x == 0 && p.y == -1 {
+		return '▲'
 	} else {
-		return rune('▲')
+		return '●'
 	}
 }
 
