@@ -153,6 +153,30 @@ func (g *Game) handleInputLeft() {
 	g.dir.y = 0
 }
 
+func (g *Game) isOnSnake(p Point) bool {
+	for _, sp := range g.snake {
+		if p.x == sp.x && p.y == sp.y {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (g *Game) isOnMalware(p Point) bool {
+	for _, mp := range g.malware {
+		if p.x == mp.x && p.y == mp.y {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (g *Game) isOutOfBounds(p Point) bool {
+	return !(p.x > 1 && p.x < g.width-2 && p.y > 1 && p.y < g.height-2)
+}
+
 func main() {
 	err := termbox.Init()
 	if err != nil {
