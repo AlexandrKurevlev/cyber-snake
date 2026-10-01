@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/nsf/termbox-go"
 )
@@ -78,8 +79,13 @@ func (g *Game) draw() {
 		termbox.SetCell(0, row, '│', termbox.ColorWhite, termbox.ColorDefault)
 	}
 
-	//snake
+	//snake head
 	termbox.SetCell(g.snake[0].x, g.snake[0].y, g.dir.ToRune(), termbox.ColorWhite, termbox.ColorDefault)
+
+	//snake body
+	for i := 1; i < len(g.snake); i++ {
+		termbox.SetCell(g.snake[i].x, g.snake[i].y, '○', termbox.ColorWhite, termbox.ColorDefault)
+	}
 
 	//score and level
 	for i, ch := range fmt.Sprintf("Score: %d Level: %d", g.score, g.level) {
@@ -215,6 +221,22 @@ func (g *Game) placeMalware() {
 	}
 }
 
+func (g *Game) move() {
+	newHead := Point{x: g.snake[0].x + g.dir.x, y: g.snake[0].y + g.dir.y}
+	if g.isOutOfBounds(newHead) || g.isOnSnake(newHead) || g.isOnMalware(newHead) {
+		g.gameOver = true
+		return
+	}
+
+	if g.isOnFood(newHead) {
+		g.score++
+		g.snake = append([]Point{newHead}, g.snake...)
+		g.placeFood()
+	} else {
+		g.snake = append([]Point{newHead}, g.snake[:len(g.snake)-1]...)
+	}
+}
+
 func main() {
 	err := termbox.Init()
 	if err != nil {
@@ -234,11 +256,16 @@ func main() {
 		}
 	}()
 
+	ticker := time.NewTicker(100 * time.Millisecond)
 	for {
 		select {
 		case ev := <-eventCh:
 			ng.handleInput(ev)
-			ng.draw()
+		case <-ticker.C:
+			ng.move()
+			if !ng.gameOver {
+				ng.draw()
+			}
 		case <-ng.quit:
 			return
 		}
