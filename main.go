@@ -13,6 +13,15 @@ type Game struct {
 	level         int
 	gameOver      bool
 	width, height int
+	quit          chan struct{}
+}
+
+func NewGame() *Game {
+	return &Game{
+		snake:   make([]Point, 0),
+		malware: make([]Point, 0),
+		quit:    make(chan struct{}),
+	}
 }
 
 func main() {}
