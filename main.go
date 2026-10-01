@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 
 	"github.com/nsf/termbox-go"
 )
@@ -37,7 +38,7 @@ type Game struct {
 }
 
 func NewGame(width, height int) *Game {
-	return &Game{
+	ng := &Game{
 		snake:   []Point{{x: width / 2, y: height / 2}},
 		malware: make([]Point, 0),
 		dir:     Point{x: 1, y: 0},
@@ -46,6 +47,11 @@ func NewGame(width, height int) *Game {
 		height:  height,
 		quit:    make(chan struct{}),
 	}
+
+	ng.placeFood()
+	ng.placeMalware()
+
+	return ng
 }
 
 func (g *Game) draw() {
@@ -78,6 +84,14 @@ func (g *Game) draw() {
 	//score and level
 	for i, ch := range fmt.Sprintf("Score: %d Level: %d", g.score, g.level) {
 		termbox.SetCell(i+5, g.height, ch, termbox.ColorWhite, termbox.ColorDefault)
+	}
+
+	//food
+	termbox.SetCell(g.food.x, g.food.y, '●', termbox.ColorGreen, termbox.ColorDefault)
+
+	//malware
+	for _, mp := range g.malware {
+		termbox.SetCell(mp.x, mp.y, '✗', termbox.ColorRed, termbox.ColorDefault)
 	}
 
 	termbox.Flush()
@@ -175,6 +189,30 @@ func (g *Game) isOnMalware(p Point) bool {
 
 func (g *Game) isOutOfBounds(p Point) bool {
 	return !(p.x >= 1 && p.x <= g.width-2 && p.y >= 1 && p.y <= g.height-2)
+}
+
+func (g *Game) isOnFood(p Point) bool {
+	return p.x == g.food.x && p.y == g.food.y
+}
+
+func (g *Game) placeFood() {
+	for {
+		fp := Point{x: rand.Intn(g.width-3) + 1, y: rand.Intn(g.height-3) + 1}
+		if !g.isOnSnake(fp) && !g.isOnMalware(fp) {
+			g.food = fp
+			break
+		}
+	}
+}
+
+func (g *Game) placeMalware() {
+	for {
+		mp := Point{x: rand.Intn(g.width-3) + 1, y: rand.Intn(g.height-3) + 1}
+		if !g.isOnSnake(mp) && !g.isOnMalware(mp) && !g.isOnFood(mp) {
+			g.malware = append(g.malware, mp)
+			break
+		}
+	}
 }
 
 func main() {
