@@ -10,6 +10,18 @@ type Point struct {
 	x, y int
 }
 
+func (p Point) ToRune() rune {
+	if p.x == 1 && p.y == 0 {
+		return rune('▶')
+	} else if p.x == 0 && p.y == 1 {
+		return rune('▼')
+	} else if p.x == -1 && p.y == 0 {
+		return rune('◀')
+	} else {
+		return rune('▲')
+	}
+}
+
 type Game struct {
 	snake         []Point
 	food          Point
@@ -64,9 +76,79 @@ func (g *Game) draw() {
 	}
 
 	//snake
-	termbox.SetCell(g.snake[0].x, g.snake[0].y, 'o', termbox.ColorWhite, termbox.ColorDefault)
+	termbox.SetCell(g.snake[0].x, g.snake[0].y, g.dir.ToRune(), termbox.ColorWhite, termbox.ColorDefault)
 
 	termbox.Flush()
+}
+
+func (g *Game) handleInput(ev termbox.Event) {
+	if ev.Type != termbox.EventKey {
+		return
+	}
+
+	if ev.Ch == 0 {
+		switch ev.Key {
+		case termbox.KeyArrowUp:
+			g.handleInputUp()
+		case termbox.KeyArrowRight:
+			g.handleInputRight()
+		case termbox.KeyArrowDown:
+			g.handleInputDown()
+		case termbox.KeyArrowLeft:
+			g.handleInputLeft()
+		case termbox.KeyEsc:
+			close(g.quit)
+		}
+	} else {
+		switch ev.Ch {
+		case 'w':
+			g.handleInputUp()
+		case 'd':
+			g.handleInputRight()
+		case 's':
+			g.handleInputDown()
+		case 'a':
+			g.handleInputLeft()
+		case 'q':
+			close(g.quit)
+		}
+	}
+}
+
+func (g *Game) handleInputUp() {
+	if g.dir.y == 1 {
+		return
+	}
+
+	g.dir.x = 0
+	g.dir.y = -1
+}
+
+func (g *Game) handleInputRight() {
+	if g.dir.x == -1 {
+		return
+	}
+
+	g.dir.x = 1
+	g.dir.y = 0
+}
+
+func (g *Game) handleInputDown() {
+	if g.dir.y == -1 {
+		return
+	}
+
+	g.dir.x = 0
+	g.dir.y = 1
+}
+
+func (g *Game) handleInputLeft() {
+	if g.dir.x == 1 {
+		return
+	}
+
+	g.dir.x = -1
+	g.dir.y = 0
 }
 
 func main() {
@@ -79,4 +161,22 @@ func main() {
 
 	ng := NewGame(40, 20)
 	ng.draw()
+
+	eventCh := make(chan termbox.Event)
+
+	go func() {
+		for {
+			eventCh <- termbox.PollEvent()
+		}
+	}()
+
+	for {
+		select {
+		case ev := <-eventCh:
+			ng.handleInput(ev)
+			ng.draw()
+		case <-ng.quit:
+			return
+		}
+	}
 }
