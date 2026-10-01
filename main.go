@@ -174,7 +174,7 @@ func (g *Game) isOnMalware(p Point) bool {
 }
 
 func (g *Game) isOutOfBounds(p Point) bool {
-	return !(p.x >= 1 && p.x <= g.width-2 && p.y >= 1 && p.y <= g.height-2)
+	return !(p.x >= 1 && p.x <= g.width-2 && p.y >= 2 && p.y <= g.height-1)
 }
 
 func main() {
