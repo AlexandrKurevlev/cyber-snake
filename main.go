@@ -22,7 +22,7 @@ func NewGame(width, height int) *Game {
 	return &Game{
 		snake:   []Point{{x: width / 2, y: height / 2}},
 		malware: make([]Point, 0),
-		dir:     Point{x: width/2 + 1, y: height / 2},
+		dir:     Point{x: 1, y: 0},
 		level:   1,
 		width:   width,
 		height:  height,
