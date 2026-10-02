@@ -272,7 +272,7 @@ func drawCenteredString(y int, s string, width int, fg termbox.Attribute) {
 	}
 }
 
-func main() {
+func playGame() {
 	err := termbox.Init()
 	if err != nil {
 		fmt.Println(err)
@@ -281,7 +281,6 @@ func main() {
 	defer termbox.Close()
 
 	ng := NewGame(40, 20)
-	ng.draw()
 
 	eventCh := make(chan termbox.Event)
 
@@ -292,6 +291,7 @@ func main() {
 	}()
 
 	ticker := time.NewTicker(100 * time.Millisecond)
+	defer ticker.Stop()
 	for {
 		select {
 		case ev := <-eventCh:
@@ -305,4 +305,8 @@ func main() {
 			return
 		}
 	}
+}
+
+func main() {
+	playGame()
 }
