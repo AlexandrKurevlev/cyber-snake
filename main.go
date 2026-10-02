@@ -144,6 +144,10 @@ func (g *Game) handleInput(ev termbox.Event) {
 			g.handleInputDown()
 		case 'a':
 			g.handleInputLeft()
+		case 'r':
+			if g.gameOver {
+				*g = *NewGame(g.width, g.height)
+			}
 		case 'q':
 			close(g.quit)
 		}
