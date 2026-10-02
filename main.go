@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+	"unicode/utf8"
 
 	"github.com/nsf/termbox-go"
 )
@@ -58,6 +59,11 @@ func NewGame(width, height int) *Game {
 func (g *Game) draw() {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
+	if g.gameOver {
+		g.drawGameOver()
+		return
+	}
+
 	//border
 	termbox.SetCell(0, 0, '┌', termbox.ColorWhite, termbox.ColorDefault)
 	for col := 1; col < g.width-1; col++ {
@@ -100,6 +106,13 @@ func (g *Game) draw() {
 		termbox.SetCell(mp.x, mp.y, '✗', termbox.ColorRed, termbox.ColorDefault)
 	}
 
+	termbox.Flush()
+}
+
+func (g *Game) drawGameOver() {
+	drawCenteredString(g.height/2-2, "GAME OVER", g.width, termbox.ColorWhite)
+	drawCenteredString(g.height/2-1, fmt.Sprintf("Score: %d Level: %d", g.score, g.level), g.width, termbox.ColorWhite)
+	drawCenteredString(g.height/2+1, "R - restart, Q - quit", g.width, termbox.ColorWhite)
 	termbox.Flush()
 }
 
@@ -233,12 +246,21 @@ func (g *Game) move() {
 		g.snake = append([]Point{newHead}, g.snake...)
 		g.placeFood()
 
-		if g.score % 5 == 0 {
+		if g.score%5 == 0 {
 			g.level++
 			g.placeMalware()
 		}
 	} else {
 		g.snake = append([]Point{newHead}, g.snake[:len(g.snake)-1]...)
+	}
+}
+
+func drawCenteredString(y int, s string, width int, fg termbox.Attribute) {
+	sl := utf8.RuneCountInString(s)
+	x := (width - sl) / 2
+	for _, ch := range s {
+		termbox.SetCell(x, y, ch, fg, termbox.ColorDefault)
+		x++
 	}
 }
 
